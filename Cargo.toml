@@ -1,6 +1,9 @@
 [package]
+description = "A streaming parser for log files. Mostly web server (apache/nginx/etc) logs supported for now."
 name = "crustylogstream"
 version = "0.1.0"
 authors = ["Cyryl Płotnicki <cyplo@cyplo.net>"]
+license = "AGPL-3.0"
+repository = "https://github.com/cyplo/crustylogstream"
 
 [dependencies]
