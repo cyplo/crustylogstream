@@ -7,3 +7,4 @@ license = "AGPL-3.0"
 repository = "https://github.com/cyplo/crustylogstream"
 
 [dependencies]
+chrono = "0.2.25"
