@@ -1,21 +1,45 @@
 use chrono::*;
-use std::any::Any;
+
+struct FakeDateTimeParser {
+    used: bool
+}
+
+impl FakeDateTimeParser {
+    fn new() -> FakeDateTimeParser {
+        FakeDateTimeParser { used: false }
+    }
+
+    fn is_used(&self) -> bool {
+        self.used
+    }
+}
 
 fn parse_datetime(text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
     DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
 }
 
-fn parse(text: &str, format: &str) -> Result<(), ()> {
+fn parse(text: &str, format: &str, parser: &FakeDateTimeParser) -> Result<(), ()> {
     Ok(())
 }
 
 #[test]
-fn can_use_time_symbol_instead_of_time_format() {
+fn returns_result() {
     let line = "[18:35:47 +0200]";
     let format = "[%t]";
-    let parsed = parse(line, format);
+    let datetime_parser = FakeDateTimeParser::new();
+    let parsed = parse(line, format, &datetime_parser);
 
     assert!(parsed.is_ok());
+}
+
+#[test]
+fn uses_datetime_parser() {
+    let line = "[18:35:47 +0200]";
+    let format = "[%t]";
+    let datetime_parser = FakeDateTimeParser::new();
+    let parsed = parse(line, format, &datetime_parser);
+
+    assert!(datetime_parser.is_used());
 }
 
 #[test]
