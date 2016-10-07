@@ -1,7 +1,33 @@
 use chrono::*;
 
+trait DateTimeParser {
+    fn parse_datetime(&mut self, text: &str) -> Result<DateTime<FixedOffset>, ParseError>;
+}
+
+struct ChronoDateTimeParser {
+}
+
+impl ChronoDateTimeParser {
+    fn new() -> ChronoDateTimeParser {
+        ChronoDateTimeParser{}
+    }
+}
+
+impl DateTimeParser for ChronoDateTimeParser {
+    fn parse_datetime(&mut self, text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
+        DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
+    }
+}
+
 struct FakeDateTimeParser {
     used: bool
+}
+
+impl DateTimeParser for FakeDateTimeParser {
+    fn parse_datetime(&mut self, text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
+        self.used = true;
+        Ok(DateTime::from_utc(Local::now().naive_local(), FixedOffset::east(0)))
+    }
 }
 
 impl FakeDateTimeParser {
@@ -15,10 +41,12 @@ impl FakeDateTimeParser {
 }
 
 fn parse_datetime(text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
-    DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
+    let mut parser = ChronoDateTimeParser::new();
+    parser.parse_datetime(text)
 }
 
-fn parse(text: &str, format: &str, parser: &FakeDateTimeParser) -> Result<(), ()> {
+fn parse(text: &str, format: &str, parser: &mut FakeDateTimeParser) -> Result<(), ()> {
+    parser.parse_datetime("");
     Ok(())
 }
 
@@ -26,8 +54,8 @@ fn parse(text: &str, format: &str, parser: &FakeDateTimeParser) -> Result<(), ()
 fn returns_result() {
     let line = "[18:35:47 +0200]";
     let format = "[%t]";
-    let datetime_parser = FakeDateTimeParser::new();
-    let parsed = parse(line, format, &datetime_parser);
+    let mut datetime_parser = FakeDateTimeParser::new();
+    let parsed = parse(line, format, &mut datetime_parser);
 
     assert!(parsed.is_ok());
 }
@@ -36,8 +64,8 @@ fn returns_result() {
 fn uses_datetime_parser() {
     let line = "[18:35:47 +0200]";
     let format = "[%t]";
-    let datetime_parser = FakeDateTimeParser::new();
-    let parsed = parse(line, format, &datetime_parser);
+    let mut datetime_parser = FakeDateTimeParser::new();
+    let parsed = parse(line, format, &mut datetime_parser);
 
     assert!(datetime_parser.is_used());
 }
