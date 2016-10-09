@@ -26,6 +26,15 @@ impl DateTimeParser for ChronoDateTimeParser {
 }
 
 #[test]
+fn has_proper_time_when_time_before_date() {
+    let parser = ChronoDateTimeParser::new("%t:%d").unwrap();
+    let line = "[18:35:47 +0200:10/Sep/2016]";
+    let timestamp = parser.parse_datetime(line).unwrap();
+    let time = timestamp.time();
+    assert_eq!(time, NaiveTime::from_hms(18, 35, 47))
+}
+
+#[test]
 fn does_not_fail_with_time_and_date_formats() {
     let parser = ChronoDateTimeParser::new("%t:%d");
     assert!(parser.is_some())
