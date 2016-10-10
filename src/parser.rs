@@ -5,23 +5,31 @@ trait DateTimeParser {
 }
 
 struct ChronoDateTimeParser {
+    line_format: String
 }
 
 impl ChronoDateTimeParser {
-    fn new(format: &str) -> Option<ChronoDateTimeParser> {
-        if !format.contains("%t") {
+    fn new(line_format: &str) -> Option<ChronoDateTimeParser> {
+        if !line_format.contains("%t") {
             return None;
         }
-        if !format.contains("%d") {
+        if !line_format.contains("%d") {
             return None;
         }
-        Some(ChronoDateTimeParser{})
+        Some(ChronoDateTimeParser{ line_format: line_format.to_string() })
     }
 }
 
 impl DateTimeParser for ChronoDateTimeParser {
     fn parse_datetime(&self, text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
-        DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
+        let first_formatter = &self.line_format[1..2];
+        println!("{}", first_formatter);
+        if first_formatter == "t" {
+            DateTime::parse_from_str(text, "[%H:%M:%S %z:%d/%b/%Y]")
+        }
+        else {
+            DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
+        }
     }
 }
 
