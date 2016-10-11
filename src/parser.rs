@@ -34,6 +34,22 @@ impl DateTimeParser for ChronoDateTimeParser {
 }
 
 #[test]
+fn can_handle_time_and_date_being_the_only_text() {
+    let line = "10/Sep/2016:18:35:47 +0200";
+    let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
+    let timestamp = parser.parse_datetime(line);
+    assert!(timestamp.is_ok());
+}
+
+#[test]
+fn can_handle_other_text_beside_format_specifiers() {
+    let line = "10/Sep/2016:18:35:47 +0200 some static text";
+    let parser = ChronoDateTimeParser::new("%d:%t some static text").unwrap();
+    let timestamp = parser.parse_datetime(line);
+    assert!(timestamp.is_ok());
+}
+
+#[test]
 fn has_proper_time_when_time_before_date() {
     let parser = ChronoDateTimeParser::new("%t:%d").unwrap();
     let line = "[18:35:47 +0200:10/Sep/2016]";
