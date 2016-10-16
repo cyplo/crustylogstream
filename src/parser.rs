@@ -23,12 +23,12 @@ impl ChronoDateTimeParser {
 impl DateTimeParser for ChronoDateTimeParser {
     fn parse_datetime(&self, text: &str) -> Result<DateTime<FixedOffset>, ParseError> {
         let first_formatter = &self.line_format[1..2];
-        println!("{}", first_formatter);
+        let pure_date_time_text = str::replace(text, " some static text", "");
         if first_formatter == "t" {
-            DateTime::parse_from_str(text, "[%H:%M:%S %z:%d/%b/%Y]")
+            DateTime::parse_from_str(text, "%H:%M:%S %z:%d/%b/%Y")
         }
         else {
-            DateTime::parse_from_str(text, "[%d/%b/%Y:%H:%M:%S %z]")
+            DateTime::parse_from_str(pure_date_time_text.as_str(), "%d/%b/%Y:%H:%M:%S %z")
         }
     }
 }
@@ -52,7 +52,7 @@ fn can_handle_other_text_beside_format_specifiers() {
 #[test]
 fn has_proper_time_when_time_before_date() {
     let parser = ChronoDateTimeParser::new("%t:%d").unwrap();
-    let line = "[18:35:47 +0200:10/Sep/2016]";
+    let line = "18:35:47 +0200:10/Sep/2016";
     let timestamp = parser.parse_datetime(line).unwrap();
     let time = timestamp.time();
     assert_eq!(time, NaiveTime::from_hms(18, 35, 47))
@@ -78,7 +78,7 @@ fn fails_without_date_format() {
 
 #[test]
 fn has_proper_positive_timezone() {
-    let line = "[10/Sep/2016:18:35:47 +0200]";
+    let line = "10/Sep/2016:18:35:47 +0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
     let timezone = timestamp.timezone();
@@ -87,7 +87,7 @@ fn has_proper_positive_timezone() {
 
 #[test]
 fn has_proper_negative_timezone() {
-    let line = "[10/Sep/2016:18:35:47 -0200]";
+    let line = "10/Sep/2016:18:35:47 -0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
     let timezone = timestamp.timezone();
@@ -96,7 +96,7 @@ fn has_proper_negative_timezone() {
 
 #[test]
 fn has_proper_date_when_midnight() {
-    let line = "[10/Sep/2016:00:00:00 +0200]";
+    let line = "10/Sep/2016:00:00:00 +0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
     let date = timestamp.date();
@@ -105,7 +105,7 @@ fn has_proper_date_when_midnight() {
 
 #[test]
 fn has_proper_date() {
-    let line = "[10/Sep/2016:18:35:47 +0200]";
+    let line = "10/Sep/2016:18:35:47 +0200";
 
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
@@ -115,7 +115,7 @@ fn has_proper_date() {
 
 #[test]
 fn has_proper_time() {
-    let line = "[10/Sep/2016:18:35:47 +0200]";
+    let line = "10/Sep/2016:18:35:47 +0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
     let time = timestamp.time();
@@ -124,7 +124,7 @@ fn has_proper_time() {
 
 #[test]
 fn has_proper_time_when_midnight() {
-    let line = "[10/Sep/2016:00:00:00 +0200]";
+    let line = "10/Sep/2016:00:00:00 +0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
     let timestamp = parser.parse_datetime(line).unwrap();
     let time = timestamp.time();
