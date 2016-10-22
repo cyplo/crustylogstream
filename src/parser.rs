@@ -42,7 +42,15 @@ fn can_handle_time_and_date_being_the_only_text() {
 }
 
 #[test]
-fn can_handle_other_text_beside_format_specifiers() {
+fn can_handle_static_text_before_the_formatters() {
+    let line = "some static text before 10/Sep/2016:18:35:47 +0200";
+    let parser = ChronoDateTimeParser::new("some static text before %d:%t").unwrap();
+    let timestamp = parser.parse_datetime(line);
+    assert!(timestamp.is_ok());
+}
+
+#[test]
+fn can_handle_static_text_after_the_formatters() {
     let line = "10/Sep/2016:18:35:47 +0200 some static text";
     let parser = ChronoDateTimeParser::new("%d:%t some static text").unwrap();
     let timestamp = parser.parse_datetime(line);
