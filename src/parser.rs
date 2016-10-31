@@ -34,6 +34,12 @@ impl DateTimeParser for ChronoDateTimeParser {
 }
 
 #[test]
+fn should_not_allow_incomplete_formatters() {
+    let parser = ChronoDateTimeParser::new("%");
+    assert!(parser.is_none());
+}
+
+#[test]
 fn can_handle_time_and_date_being_the_only_text() {
     let line = "10/Sep/2016:18:35:47 +0200";
     let parser = ChronoDateTimeParser::new("%d:%t").unwrap();
